@@ -1,115 +1,182 @@
 # FastAPI Project
 
-Una API REST construida con FastAPI que incluye autenticación, gestión de usuarios y documentación automática.
+A REST API built with FastAPI that provides intelligent auto insurance advisory with automatic documentation.
 
-## Características
+## Features
 
-- ✅ FastAPI con documentación automática (Swagger/OpenAPI)
-- ✅ Autenticación JWT
-- ✅ Gestión de usuarios (CRUD)
-- ✅ Validación de datos con Pydantic
-- ✅ Configuración con variables de entorno
-- ✅ Tests unitarios
-- ✅ Estructura modular y escalable
-- ✅ CORS configurado
-- ✅ Health checks
+- ✅ FastAPI with automatic documentation (Swagger/OpenAPI)
+- ✅ Intelligent auto insurance advisory with AI
+- ✅ Session management with automatic TTL
+- ✅ Data validation with Pydantic
+- ✅ Configuration with environment variables
+- ✅ Unit tests
+- ✅ Modular and scalable structure
+- ✅ CORS configured
 
-## Instalación
+## Installation
 
-1. **Clonar el repositorio**
+1. **Clone the repository**
    ```bash
-   git clone <tu-repositorio>
+   git clone <your-repository>
    cd fastapi-project
    ```
 
-2. **Crear entorno virtual**
+2. **Create virtual environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # En Windows: venv\Scripts\activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Instalar dependencias**
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Configurar variables de entorno**
+4. **Configure environment variables**
    ```bash
    cp env.example .env
-   # Editar .env con tus configuraciones
+   # Edit .env with your configurations
    ```
 
-## Uso
+## Usage
 
-### Ejecutar en desarrollo
+### Run in development
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Ejecutar en producción
+### Run in production
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-### Ejecutar tests
+### Run tests
 ```bash
 pytest
 ```
 
-## Endpoints disponibles
+## Available Endpoints
 
-### Health Checks
-- `GET /api/v1/health` - Health check básico
-- `GET /api/v1/health/detailed` - Health check detallado
+### Insurance Advisory
+- `POST /advice/start` - Start new advisory session
+- `POST /advice/reply` - Process user response and generate next question or quote
 
-### Usuarios
-- `GET /api/v1/users/` - Listar usuarios
-- `GET /api/v1/users/{user_id}` - Obtener usuario específico
-- `POST /api/v1/users/` - Crear usuario
-- `PUT /api/v1/users/{user_id}` - Actualizar usuario
-- `DELETE /api/v1/users/{user_id}` - Eliminar usuario
+## Documentation
 
-## Documentación
-
-Una vez que ejecutes la aplicación, puedes acceder a:
+Once you run the application, you can access:
 
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 - **OpenAPI JSON**: http://localhost:8000/openapi.json
 
-## Estructura del proyecto
+## Insurance Advisory APIs
+
+### POST /advice/start
+
+Starts a new advisory session for auto insurance quotes.
+
+**Response:**
+```json
+{
+  "session_id": "uuid-string",
+  "message": "Welcome message and first question"
+}
+```
+
+### POST /advice/reply
+
+Processes the user's response and generates the next question or final quote.
+
+**Request:**
+```json
+{
+  "session_id": "uuid-string",
+  "user_text": "User response"
+}
+```
+
+**Response:**
+```json
+{
+  "session_id": "uuid-string",
+  "message": "Next question or quote",
+  "state": {
+    "vehicle_year": 2020,
+    "vehicle_make": "Toyota",
+    "vehicle_model": "Corolla",
+    "vehicle_value_usd": 25000.0,
+    "usage": "personal",
+    "city": "Mexico City",
+    "driver_age": 30,
+    "claims_last3y": 0,
+    "anti_theft": true,
+    "garage_overnight": true,
+    "deductible_pct": 10,
+    "addons": ["roadside_assistance", "auto_replacement"]
+  },
+  "quote": {
+    "offers": [
+      {
+        "carrier": "Insurance ABC",
+        "plan": "Medium",
+        "annual_premium_usd": 1200.0,
+        "deductible_pct": 10,
+        "addons": ["roadside_assistance"],
+        "coverage_notes": "Complete coverage"
+      }
+    ],
+    "recommendation": "We recommend the Medium plan",
+    "disclaimer": "Prices are estimates"
+  }
+}
+```
+
+**Usage flow:**
+1. Call `/advice/start` to start session
+2. Use the returned `session_id` in subsequent calls to `/advice/reply`
+3. Answer the system's questions with vehicle and driver information
+4. The system will automatically generate a quote when it has all necessary information
+
+**Required fields for quote:**
+- `vehicle_year`: Vehicle year (1980-2035)
+- `vehicle_make`: Vehicle brand
+- `vehicle_model`: Vehicle model
+- `vehicle_value_usd`: Vehicle value in USD
+- `usage`: Vehicle usage ("personal" or "commercial")
+- `city`: City of residence
+- `driver_age`: Driver age (16-90)
+- `claims_last3y`: Claims in the last 3 years (0-10)
+
+## Project Structure
 
 ```
 ├── app/
-│   ├── core/           # Configuración central
-│   ├── database/       # Configuración de base de datos
-│   ├── models/         # Modelos SQLAlchemy
-│   ├── routers/        # Endpoints de la API
-│   ├── schemas/        # Esquemas Pydantic
-│   └── utils/          # Utilidades
-├── tests/              # Tests unitarios
-├── main.py             # Punto de entrada
-├── requirements.txt    # Dependencias
-└── README.md          # Este archivo
+│   ├── core/           # Central configuration
+│   ├── routers/        # API endpoints
+│   ├── schemas/        # Pydantic schemas
+│   ├── services/       # Business services
+│   └── utils/          # Utilities
+├── tests/              # Unit tests
+├── main.py             # Entry point
+├── requirements.txt    # Dependencies
+└── README.md          # This file
 ```
 
-## Configuración
+## Configuration
 
-Las variables de entorno principales son:
+The main environment variables are:
 
-- `SECRET_KEY`: Clave secreta para JWT
-- `DATABASE_URL`: URL de conexión a la base de datos
-- `DEBUG`: Modo debug (True/False)
-- `ACCESS_TOKEN_EXPIRE_MINUTES`: Tiempo de expiración del token
+- `DEBUG`: Debug mode (True/False)
+- `SESSION_TTL_SECONDS`: Session lifetime in seconds (default: 3600)
 
-## Contribuir
+## Contributing
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. Fork the project
+2. Create a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Licencia
+## License
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+This project is under the MIT License. See the `LICENSE` file for more details.
